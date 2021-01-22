@@ -8,10 +8,31 @@ app.use(express.json());
 
 const projects = [];
 
-// list all projects
-app.get('/projects', (request, response) => {
+// middleware
+function logRoutes(request, response, next) {
 
-    return response.json(projects);
+    const { method, url } = request;
+
+    const route = `[${method.toUpperCase()}] ${url}`;
+
+    console.log(route);
+
+    return next();
+}
+
+// app.use(logRoutes); if u wanna see all routes
+
+// list all projects
+// app.get('/projects', (request, response) => { without mw for all routes
+app.get('/projects', logRoutes, (request, response) => {
+
+    const { title } = request.query;
+
+    const results = title
+        ? projects.filter(project => project.title.includes(title))
+        : projects;
+
+    return response.json(results);
 
 });
 
